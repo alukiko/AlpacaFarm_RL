@@ -25,6 +25,7 @@ PROBE_FIELDS = ["probe", "n", "metric", "value", "interpretation"]
 VERDICTS = {"A", "B", "TIE"}
 HUMAN_LABELS = VERDICTS | {"SKIP"}
 ANNOTATORS = ("A1", "A2", "A3")
+NOTEBOOK_INITIALS = {"A1": "AU", "A2": "VO", "A3": "AD"}
 EXPECTED_IDS = [f"K06-P3-{number:03d}" for number in range(1, 53)]
 PREPARED_FILES = {
     "slice.jsonl", "instruction.md", "annotations.csv",
@@ -225,7 +226,7 @@ def check_scorer(audit: Path, expected_ids: set[str], phase: str,
 
 def check_notebooks(directory: Path, errors: list[str]) -> None:
     for annotator in ANNOTATORS:
-        path = directory / f"K06_{annotator}_lab3_student.ipynb"
+        path = directory / f"K06_{NOTEBOOK_INITIALS[annotator]}_lab3_student.ipynb"
         if not path.is_file():
             errors.append(f"Missing {path}")
             continue
