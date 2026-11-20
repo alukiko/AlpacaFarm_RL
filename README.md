@@ -70,6 +70,8 @@
 ```bash
 python scripts/run_analysis.py
 python -m unittest discover -s tests -v
+python -m pip install -r requirements-artifacts.txt
+python docs/build_artifacts.py
 python scripts/check_submission.py
 ```
 
