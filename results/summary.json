@@ -1,0 +1,126 @@
+{
+  "method": "Length of whitespace-delimited response; ties count as errors",
+  "human_pairs": 648,
+  "human_agreement_counts": {
+    "2:2": 147,
+    "3:1": 297,
+    "4:0": 201,
+    "nonstandard_vote_count": 3
+  },
+  "primary_eligible_pairs": 498,
+  "excluded_2_to_2_pairs": 147,
+  "excluded_nonstandard_vote_count_pairs": 3,
+  "overlap_audit": {
+    "judge_rows": 10465,
+    "invalid_judge_rows": 912,
+    "exact_match_pairs": 4,
+    "whitespace_only_match_pairs": 1,
+    "direct_unique_pairs": 4,
+    "swapped_unique_pairs": 0,
+    "ambiguous_pairs": 1,
+    "reliable_unique_pairs": 4,
+    "unmatched_pairs": 643
+  },
+  "published_judge_usable_for_primary": false,
+  "main_evaluator": {
+    "n": 498,
+    "errors": 214,
+    "error_rate": 0.42971887550200805,
+    "error_wilson_95": [
+      0.386942185534358,
+      0.473571530959897
+    ]
+  },
+  "character_length_comparator": {
+    "n": 498,
+    "errors": 195,
+    "error_rate": 0.39156626506024095,
+    "error_wilson_95": [
+      0.3496836847945002,
+      0.43510890636806465
+    ]
+  },
+  "constant_position_1_baseline": {
+    "n": 498,
+    "errors": 236,
+    "error_rate": 0.4738955823293173,
+    "error_wilson_95": [
+      0.43040896303937426,
+      0.5177818459442062
+    ]
+  },
+  "random_choice_expected_error_rate": 0.5,
+  "length_ties_counted_as_errors": 44,
+  "human_agreement_subgroups": {
+    "4:0": {
+      "n": 201,
+      "errors": 78,
+      "error_rate": 0.3880597014925373,
+      "error_wilson_95": [
+        0.3233925890302315,
+        0.45692531995619934
+      ]
+    },
+    "3:1": {
+      "n": 297,
+      "errors": 136,
+      "error_rate": 0.45791245791245794,
+      "error_wilson_95": [
+        0.40214772611929905,
+        0.5147520253378286
+      ]
+    }
+  },
+  "word_gap_at_most_30": {
+    "n": 352,
+    "errors": 176,
+    "error_rate": 0.5,
+    "error_wilson_95": [
+      0.4480494891688646,
+      0.5519505108311353
+    ]
+  },
+  "word_gap_over_30": {
+    "n": 146,
+    "errors": 38,
+    "error_rate": 0.2602739726027397,
+    "error_wilson_95": [
+      0.1958955698057117,
+      0.3369440024266663
+    ]
+  },
+  "padding_probe": {
+    "sample_selection": "first 100 initially correct standard pairs sorted by SHA-256 pair_id",
+    "padding_text": "additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context additional context",
+    "added_words_per_pair": 64,
+    "n": 100,
+    "flips_relative_to_original_labels": 83,
+    "flip_rate": 0.83,
+    "flip_wilson_95": [
+      0.7445199523239887,
+      0.8910643388594006
+    ],
+    "median_minimum_words_to_reverse": 20.5,
+    "interpretation": "Sensitivity only: changed responses have no new human labels."
+  },
+  "limitations": [
+    "Human majority is a preference proxy, not factual quality or safety.",
+    "Padding changes the answer; no new human preferences were collected.",
+    "Published GPT-4 annotations cover too few identical human pairs for comparison."
+  ],
+  "source_data": {
+    "human": {
+      "path": "data/raw/alpaca_farm_human_crossannotations.json",
+      "sha256": "e75b70d6176cf50f8d9898065541445050e164ebce3704e6d7becf99e39ed704"
+    },
+    "judge": {
+      "path": "data/raw/alpaca_eval_annotations_alpaca_eval_gpt4.json",
+      "sha256": "e73710ff283d5b8f42fe176db791c8a4f4c6eea9641ccbc6117667110848538c"
+    }
+  },
+  "human_data_quality": {
+    "input_rows": 2596,
+    "invalid_rows": 0,
+    "unique_pairs": 648
+  }
+}
