@@ -96,3 +96,7 @@
 
 - [AlpacaEval: репозиторий и описание метода](https://github.com/tatsu-lab/alpaca_eval)
 - [Датасет `tatsu-lab/alpaca_eval` на Hugging Face](https://huggingface.co/datasets/tatsu-lab/alpaca_eval)
+
+## Отдельное командное задание: практика 3
+
+Материалы практики 3 команды К06 находятся в [PRACTICE3.md](PRACTICE3.md). Карточка проекта выше сохранена из основной ветки.
