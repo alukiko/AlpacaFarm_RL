@@ -107,9 +107,10 @@ def annotate(
     annotator: str,
     pilot_only: bool = False,
     instruction_version: str | None = None,
+    annotations_file: Path | None = None,
 ) -> None:
     objects = load_objects(audit_dir / "slice.jsonl")
-    annotations_path = audit_dir / "annotations.csv"
+    annotations_path = annotations_file if annotations_file is not None else audit_dir / "annotations.csv"
     _, rows = load_annotations(annotations_path)
     assigned = [row for row in rows if row["annotator"] == annotator]
     if not assigned:
@@ -152,13 +153,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--annotator", required=True, choices=("A1", "A2", "A3"))
     parser.add_argument("--audit-dir", type=Path, default=Path("audit"))
+    parser.add_argument("--annotations-file", type=Path, help="личная таблица; по умолчанию audit/annotations.csv")
     parser.add_argument("--pilot-only", action="store_true", help="только первые 10 объектов core")
     parser.add_argument(
         "--instruction-version", choices=("1.1",),
         help="записать новую версию инструкции для следующих суждений",
     )
     args = parser.parse_args()
-    annotate(args.audit_dir, args.annotator, args.pilot_only, args.instruction_version)
+    annotate(
+        args.audit_dir, args.annotator, args.pilot_only, args.instruction_version,
+        annotations_file=args.annotations_file,
+    )
 
 
 if __name__ == "__main__":

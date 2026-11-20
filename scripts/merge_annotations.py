@@ -1,4 +1,4 @@
-"""Merge complete, independently filled Practice 3 annotation workspaces."""
+"""Merge three completed personal annotation CSVs into the team CSV."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from pathlib import Path
 
 FIELDS = ["id", "annotator", "label", "order", "instruction_version", "elapsed_seconds"]
 ANNOTATORS = ("A1", "A2", "A3")
+INITIALS = {"A1": "AU", "A2": "VO", "A3": "AD"}
 LABELS = {"A", "B", "TIE", "SKIP"}
 VERSIONS = {"1.0", "1.1"}
 ROWS_PER_ANNOTATOR = 28
@@ -101,14 +102,14 @@ def save_annotations(path: Path, rows: list[dict[str, str]]) -> None:
             temporary_path.unlink(missing_ok=True)
 
 
-def merge_annotations(team_audit_dir: Path, workspaces_dir: Path) -> bool:
+def merge_annotations(team_audit_dir: Path, personal_dir: Path) -> bool:
     team_path = team_audit_dir / "annotations.csv"
     team_rows = read_annotations(team_path)
     assignments = validate_team_rows(team_path, team_rows)
 
     personal_rows = {}
     for annotator in ANNOTATORS:
-        path = workspaces_dir / annotator / "audit" / "annotations.csv"
+        path = personal_dir / f"{INITIALS[annotator]}_annotations.csv"
         rows = read_annotations(path)
         validate_personal_rows(path, annotator, rows, assignments[annotator])
         personal_rows[annotator] = rows
@@ -140,10 +141,10 @@ def merge_annotations(team_audit_dir: Path, workspaces_dir: Path) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--team-audit-dir", type=Path, default=Path("audit"))
-    parser.add_argument("--workspaces-dir", required=True, type=Path)
+    parser.add_argument("--personal-dir", type=Path, default=Path("personal_annotations"))
     args = parser.parse_args()
     try:
-        changed = merge_annotations(args.team_audit_dir, args.workspaces_dir)
+        changed = merge_annotations(args.team_audit_dir, args.personal_dir)
     except (OSError, ValueError, csv.Error) as exc:
         parser.error(str(exc))
     print("Merged all 84 annotations." if changed else "All 84 annotations already match.")

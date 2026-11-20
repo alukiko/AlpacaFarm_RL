@@ -154,6 +154,25 @@ def check_annotations(audit: Path, core: set[str], second: set[str], phase: str,
           "annotations.csv: use 24 distinct second ids once each")
 
 
+def check_personal_templates(personal_dir: Path, audit: Path, errors: list[str]) -> None:
+    team_rows = read_csv(audit / "annotations.csv", ANNOTATION_FIELDS, errors)
+    for annotator in ANNOTATORS:
+        initials = NOTEBOOK_INITIALS[annotator]
+        path = personal_dir / f"{initials}_annotations.csv"
+        rows = read_csv(path, ANNOTATION_FIELDS, errors)
+        expected = [row for row in team_rows if row.get("annotator") == annotator]
+        issue(errors, len(rows) == 28, f"{path.name}: expected 28 assigned rows")
+        issue(errors, len(expected) == 28, f"annotations.csv: expected 28 rows for {annotator}")
+        for number, (row, assignment) in enumerate(zip(rows, expected), start=2):
+            prefix = f"{path.name}:{number}"
+            for field in ("id", "annotator", "order", "instruction_version"):
+                issue(errors, row.get(field) == assignment.get(field),
+                      f"{prefix}: {field} differs from team template")
+            issue(errors, row.get("label") == "", f"{prefix}: label must be blank")
+            issue(errors, row.get("elapsed_seconds") == "",
+                  f"{prefix}: elapsed_seconds must be blank")
+
+
 def check_baseline(audit: Path, expected_ids: set[str], phase: str,
                    errors: list[str]) -> None:
     rows = read_csv(audit / "baseline_predictions.csv", BASELINE_FIELDS, errors)
@@ -256,14 +275,18 @@ def main() -> None:
     parser.add_argument("--phase", choices=("prepared", "final"), default="prepared")
     parser.add_argument("--audit-dir", type=Path, default=Path("audit"))
     parser.add_argument("--notebooks-dir", type=Path, default=Path("notebooks"))
+    parser.add_argument("--personal-dir", type=Path, default=Path("personal_annotations"))
     args = parser.parse_args()
     audit = args.audit_dir if args.audit_dir.is_absolute() else ROOT / args.audit_dir
     notebooks = args.notebooks_dir if args.notebooks_dir.is_absolute() else ROOT / args.notebooks_dir
+    personal = args.personal_dir if args.personal_dir.is_absolute() else ROOT / args.personal_dir
 
     errors: list[str] = []
     core, second = check_slice(audit, errors)
     check_instruction(audit, errors)
     check_annotations(audit, core, second, args.phase, errors)
+    if args.phase == "prepared":
+        check_personal_templates(personal, audit, errors)
     check_baseline(audit, core | second, args.phase, errors)
     check_probes(audit, args.phase, errors)
     check_scorer(audit, core | second, args.phase, errors)

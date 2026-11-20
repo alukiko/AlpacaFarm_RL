@@ -1,16 +1,16 @@
-"""Create separate blank audit folders for the three future human annotators."""
+"""Create three blank personal CSVs from the team assignment template."""
 
 from __future__ import annotations
 
 import argparse
 import csv
-import shutil
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 COLUMNS = ["id", "annotator", "label", "order", "instruction_version", "elapsed_seconds"]
 ANNOTATORS = ("A1", "A2", "A3")
+INITIALS = {"A1": "AU", "A2": "VO", "A3": "AD"}
 
 
 def read_team_assignments(path: Path) -> list[dict[str, str]]:
@@ -26,14 +26,6 @@ def read_team_assignments(path: Path) -> list[dict[str, str]]:
         if len(assigned) != 28 or len({row["id"] for row in assigned}) != 28:
             raise ValueError(f"Expected 28 unique assignments for {annotator}")
     return rows
-
-
-def copy_immutable(source: Path, target: Path) -> None:
-    if target.exists():
-        if target.read_bytes() != source.read_bytes():
-            raise ValueError(f"Existing file differs; refusing to overwrite {target}")
-        return
-    shutil.copyfile(source, target)
 
 
 def create_personal_csv(path: Path, assignments: list[dict[str, str]]) -> None:
@@ -57,20 +49,18 @@ def create_personal_csv(path: Path, assignments: list[dict[str, str]]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--team-audit-dir", type=Path, default=ROOT / "audit")
-    parser.add_argument("--workspaces-dir", type=Path, default=ROOT.parent / "k06_p3_workspaces")
+    parser.add_argument("--personal-dir", type=Path, default=ROOT / "personal_annotations")
     args = parser.parse_args()
 
     team_audit = args.team_audit_dir.resolve()
-    workspaces = args.workspaces_dir.resolve()
+    personal_dir = args.personal_dir.resolve()
+    personal_dir.mkdir(parents=True, exist_ok=True)
     rows = read_team_assignments(team_audit / "annotations.csv")
     for annotator in ANNOTATORS:
-        personal_audit = workspaces / annotator / "audit"
-        personal_audit.mkdir(parents=True, exist_ok=True)
-        for name in ("slice.jsonl", "instruction.md"):
-            copy_immutable(team_audit / name, personal_audit / name)
         assigned = [row for row in rows if row["annotator"] == annotator]
-        create_personal_csv(personal_audit / "annotations.csv", assigned)
-        print(f"{annotator}: 28 blank assignments in {personal_audit}")
+        path = personal_dir / f"{INITIALS[annotator]}_annotations.csv"
+        create_personal_csv(path, assigned)
+        print(f"{annotator}: 28 blank assignments in {path}")
 
 
 if __name__ == "__main__":
