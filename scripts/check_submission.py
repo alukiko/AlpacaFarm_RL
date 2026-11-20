@@ -16,6 +16,9 @@ EXPECTED_ROWS = {
     "pair_metrics.csv": 648,
     "judge_overlap_audit.csv": 648,
     "padding_probe.csv": 100,
+    "local_judge_pair_metrics.csv": 200,
+    "order_swap_probe.csv": 50,
+    "same_order_repeat_probe.csv": 50,
 }
 
 
@@ -46,6 +49,11 @@ def main() -> None:
         ROOT / "data/README.md",
         ROOT / "data/raw/alpaca_farm_human_crossannotations.json",
         ROOT / "data/raw/alpaca_eval_annotations_alpaca_eval_gpt4.json",
+        ROOT / "data/generated/README.md",
+        ROOT / "data/generated/local_judge_cpu_base.jsonl",
+        ROOT / "data/generated/local_judge_cpu_swap.jsonl",
+        ROOT / "data/generated/local_judge_cpu_repeat.jsonl",
+        ROOT / "docs/results_overview.md",
         RESULTS / "summary.json",
         *(RESULTS / name for name in EXPECTED_ROWS),
         ROOT / "docs/report.pdf",
@@ -77,6 +85,10 @@ def main() -> None:
     assert sum(int(row["length_error"]) for row in primary) == summary["main_evaluator"]["errors"]
     assert len({row["pair_id"] for row in pairs}) == len(pairs)
     assert summary["overlap_audit"]["reliable_unique_pairs"] < 200
+    assert summary["local_judge"]["valid_decisions"] >= 200
+    assert summary["local_judge"]["options"]["num_gpu"] == 0
+    assert summary["local_judge"]["order_swap"]["n"] == 50
+    assert summary["local_judge"]["same_order_repeat"]["n"] == 50
 
     report_pages = pdf_pages(ROOT / "docs/report.pdf")
     defense_pages = pdf_pages(ROOT / "docs/defense.pdf")

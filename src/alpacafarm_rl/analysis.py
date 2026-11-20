@@ -151,6 +151,10 @@ def summarize(
     padding: dict[str, Any],
 ) -> dict[str, Any]:
     counts = Counter(row["agreement"] for row in evaluated)
+    standard_votes = counts["4:0"] + counts["3:1"] + counts["2:2"]
+    pairwise_agreement = (
+        counts["4:0"] + 0.5 * counts["3:1"] + counts["2:2"] / 3
+    ) / standard_votes
     primary = [row for row in evaluated if row["eligible"]]
     tied = [row for row in primary if row["length_choice"] == 0]
     large_gap = [row for row in primary if row["absolute_word_gap"] > 30]
@@ -165,6 +169,7 @@ def summarize(
         "method": "Length of whitespace-delimited response; ties count as errors",
         "human_pairs": len(evaluated),
         "human_agreement_counts": dict(sorted(counts.items())),
+        "human_mean_pairwise_agreement": pairwise_agreement,
         "primary_eligible_pairs": len(primary),
         "excluded_2_to_2_pairs": counts["2:2"],
         "excluded_nonstandard_vote_count_pairs": counts["nonstandard_vote_count"],

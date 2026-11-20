@@ -1,5 +1,5 @@
 K06 submission check: PASS
-Repeat analysis: 0.76 s (<600 s)
+Repeat analysis: 1.04 s (<600 s)
 Result files: byte-identical on repeat run
 Raw data: SHA-256 verified
 CSV schema/counts: verified

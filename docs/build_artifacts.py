@@ -1,7 +1,8 @@
-"""Build the four-page research report and seven-slide defense PDF.
+"""Shared PDF drawing helpers and the command to build current deliverables.
 
 Run after `python scripts/run_analysis.py`. Requires reportlab; the analysis
-itself has no third-party Python dependencies.
+itself has no third-party Python dependencies. Length-only builders are kept
+for the earlier exploratory study; the command builds the local-judge report.
 """
 
 from __future__ import annotations
@@ -163,7 +164,7 @@ def report_footer(pdf: canvas.Canvas, doc: SimpleDocTemplate) -> None:
     pdf.restoreState()
 
 
-def build_report() -> None:
+def build_length_report() -> None:
     main = SUMMARY["main_evaluator"]
     char = SUMMARY["character_length_comparator"]
     base = SUMMARY["constant_position_1_baseline"]
@@ -370,8 +371,8 @@ def panel(pdf: canvas.Canvas, x: float, y: float, width: float, height: float,
     pdf.roundRect(x, y, width, height, 12, fill=1, stroke=0)
     pdf.setFillColor(accent)
     pdf.roundRect(x + 18, y + height - 28, 6, 11, 3, fill=1, stroke=0)
-    slide_text(pdf, title, x + 35, y + height - 14, width - 55, 16, color=WHITE, bold=True)
-    slide_text(pdf, body, x + 22, y + height - 57, width - 44, 13.3,
+    slide_text(pdf, title, x + 35, y + height - 14, width - 55, 18, color=WHITE, bold=True)
+    slide_text(pdf, body, x + 22, y + height - 59, width - 44, 16.5,
                color=colors.HexColor("#D7E5EE"))
 
 
@@ -385,7 +386,7 @@ def slide_bar(pdf: canvas.Canvas, y: float, label: str, value: float,
     slide_text(pdf, display, 754, y + 20, 155, 15, color=WHITE, bold=True)
 
 
-def build_slides() -> None:
+def build_length_slides() -> None:
     main = SUMMARY["main_evaluator"]
     char = SUMMARY["character_length_comparator"]
     base = SUMMARY["constant_position_1_baseline"]
@@ -457,7 +458,10 @@ def build_slides() -> None:
 
 
 if __name__ == "__main__":
+    from build_judge_artifacts import build_report as build_judge_report
+    from build_judge_artifacts import build_slides as build_judge_slides
+
     register_fonts()
-    build_report()
-    build_slides()
+    build_judge_report()
+    build_judge_slides()
     print("Built docs/report.pdf and docs/defense.pdf")

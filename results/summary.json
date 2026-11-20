@@ -1,5 +1,5 @@
 {
-  "method": "Length of whitespace-delimited response; ties count as errors",
+  "method": "Local CPU-only Qwen3 judge on 200 human-majority pairs; word length, character length, and first position as matched baselines",
   "human_pairs": 648,
   "human_agreement_counts": {
     "2:2": 147,
@@ -7,6 +7,7 @@
     "4:0": 201,
     "nonstandard_vote_count": 3
   },
+  "human_mean_pairwise_agreement": 0.6178294573643411,
   "primary_eligible_pairs": 498,
   "excluded_2_to_2_pairs": 147,
   "excluded_nonstandard_vote_count_pairs": 3,
@@ -116,11 +117,167 @@
     "judge": {
       "path": "data/raw/alpaca_eval_annotations_alpaca_eval_gpt4.json",
       "sha256": "e73710ff283d5b8f42fe176db791c8a4f4c6eea9641ccbc6117667110848538c"
+    },
+    "local_judge_base": {
+      "path": "data/generated/local_judge_cpu_base.jsonl",
+      "sha256": "dcf64c48845d69c24ea33a3c9c047ea92d839d2937b6c5f30365fd7d7b633d5b"
+    },
+    "local_judge_swap": {
+      "path": "data/generated/local_judge_cpu_swap.jsonl",
+      "sha256": "5ef0c5a7c0a7263325726f5f5c5ff904534fc4ef5e452554ae1493609e49efd2"
+    },
+    "local_judge_repeat": {
+      "path": "data/generated/local_judge_cpu_repeat.jsonl",
+      "sha256": "5a1eef11089bdbd4799ae563ba45b0fea7be090bc1f83d770615534ae05e5619"
     }
   },
   "human_data_quality": {
     "input_rows": 2596,
     "invalid_rows": 0,
     "unique_pairs": 648
+  },
+  "study_primary_evaluator": "local_judge.judge",
+  "local_judge": {
+    "model": "qwen3:4b-instruct-2507-q4_K_M",
+    "model_id": "0edcdef34593",
+    "options": {
+      "temperature": 0,
+      "seed": 42,
+      "num_ctx": 4096,
+      "num_predict": 24,
+      "num_gpu": 0
+    },
+    "sample_selection": "first 200 standard majority pairs sorted by SHA-256 pair_id",
+    "sample_size": 200,
+    "valid_decisions": 200,
+    "coverage": 1.0,
+    "judge": {
+      "n": 200,
+      "errors": 71,
+      "error_rate": 0.355,
+      "error_wilson_95": [
+        0.2919862754043116,
+        0.42347886924509565
+      ]
+    },
+    "word_length_on_same_pairs": {
+      "n": 200,
+      "errors": 81,
+      "error_rate": 0.405,
+      "error_wilson_95": [
+        0.3393777128250677,
+        0.47420289918661307
+      ]
+    },
+    "character_length_on_same_pairs": {
+      "n": 200,
+      "errors": 75,
+      "error_rate": 0.375,
+      "error_wilson_95": [
+        0.31085436858409826,
+        0.44385696301021843
+      ]
+    },
+    "position_1_on_same_pairs": {
+      "n": 200,
+      "errors": 95,
+      "error_rate": 0.475,
+      "error_wilson_95": [
+        0.4069162264657108,
+        0.5440260398531525
+      ]
+    },
+    "paired_judge_minus_length": {
+      "judge_minus_length_error_rate": -0.05,
+      "bootstrap_95": [
+        -0.14,
+        0.045
+      ],
+      "resamples": 5000,
+      "seed": 20261120
+    },
+    "human_agreement_subgroups": {
+      "4:0": {
+        "n": 76,
+        "errors": 19,
+        "error_rate": 0.25,
+        "error_wilson_95": [
+          0.1662892740828634,
+          0.35776751844970534
+        ]
+      },
+      "3:1": {
+        "n": 124,
+        "errors": 52,
+        "error_rate": 0.41935483870967744,
+        "error_wilson_95": [
+          0.33620591853325965,
+          0.5073503097474948
+        ]
+      }
+    },
+    "word_gap_at_most_30": {
+      "n": 131,
+      "errors": 44,
+      "error_rate": 0.33587786259541985,
+      "error_wilson_95": [
+        0.2606994715277561,
+        0.4204075086542116
+      ]
+    },
+    "word_gap_over_30": {
+      "n": 69,
+      "errors": 27,
+      "error_rate": 0.391304347826087,
+      "error_wilson_95": [
+        0.2848132354273476,
+        0.5092600815702724
+      ]
+    },
+    "order_swap": {
+      "n": 50,
+      "changed_choices": 24,
+      "change_rate": 0.48,
+      "change_wilson_95": [
+        0.34797135286578046,
+        0.6148825510995539
+      ],
+      "original_order_error": {
+        "n": 50,
+        "errors": 12,
+        "error_rate": 0.24,
+        "error_wilson_95": [
+          0.1429739139699173,
+          0.3741268375794292
+        ]
+      },
+      "reversed_order_error": {
+        "n": 50,
+        "errors": 16,
+        "error_rate": 0.32,
+        "error_wilson_95": [
+          0.20758216260656845,
+          0.45810297308144077
+        ]
+      }
+    },
+    "same_order_repeat": {
+      "n": 50,
+      "changed_choices": 0,
+      "change_rate": 0.0,
+      "change_wilson_95": [
+        0.0,
+        0.07134759913335872
+      ],
+      "repeated_order_error": {
+        "n": 50,
+        "errors": 12,
+        "error_rate": 0.24,
+        "error_wilson_95": [
+          0.1429739139699173,
+          0.3741268375794292
+        ]
+      }
+    }
   }
 }
