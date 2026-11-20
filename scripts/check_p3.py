@@ -137,7 +137,8 @@ def check_annotations(audit: Path, core: set[str], second: set[str], phase: str,
         else:
             issue(errors, row["label"] in HUMAN_LABELS,
                   f"{prefix}: label must be A, B, TIE, or SKIP")
-            issue(errors, positive_number(row["elapsed_seconds"]),
+            seconds = finite_number(row["elapsed_seconds"])
+            issue(errors, seconds is not None and seconds > 0,
                   f"{prefix}: elapsed_seconds must be positive")
         by_annotator[annotator].append(row)
         pairs.append((annotator, object_id))
@@ -186,12 +187,12 @@ def check_baseline(audit: Path, expected_ids: set[str], phase: str,
               + (", or blank in prepared phase" if phase == "prepared" else ""))
 
 
-def positive_number(value: str) -> bool:
+def finite_number(value: str | None) -> float | None:
     try:
         number = float(value)
     except (TypeError, ValueError):
-        return False
-    return math.isfinite(number) and number > 0
+        return None
+    return number if math.isfinite(number) else None
 
 
 def check_probes(audit: Path, phase: str, errors: list[str]) -> None:
@@ -203,20 +204,13 @@ def check_probes(audit: Path, phase: str, errors: list[str]) -> None:
     for number, row in enumerate(rows, start=2):
         prefix = f"probe_results.csv:{number}"
         for field in ("probe", "metric", "interpretation"):
-            issue(errors, isinstance(row[field], str) and bool(row[field].strip()),
+            issue(errors, bool((row[field] or "").strip()),
                   f"{prefix}: {field} is blank")
-        issue(errors, isinstance(row["n"], str) and row["n"].isdigit() and int(row["n"]) > 0,
+        cases = row["n"] or ""
+        issue(errors, cases.isdecimal() and int(cases) > 0,
               f"{prefix}: n must be a positive integer")
-        issue(errors, isinstance(row["value"], str) and "%" not in row["value"]
-              and numeric(row["value"]),
+        issue(errors, finite_number(row["value"]) is not None,
               f"{prefix}: value must be a finite number without percent sign")
-
-
-def numeric(value: str) -> bool:
-    try:
-        return math.isfinite(float(value))
-    except (TypeError, ValueError):
-        return False
 
 
 def check_scorer(audit: Path, expected_ids: set[str], phase: str,

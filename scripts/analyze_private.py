@@ -52,10 +52,11 @@ def main() -> None:
     if len(pairs) != 52 or len(ids) != 52 or set(base) != ids or set(swap) != ids:
         raise ValueError("Expected 52 matching, unique IDs in slice, base scorer, and swapped scorer")
 
-    baseline = [{"id": pair["id"], "verdict": longer_answer(pair)} for pair in pairs]
-    unequal = [pair for pair in pairs if longer_answer(pair) != "TIE"]
+    length_choices = {pair["id"]: longer_answer(pair) for pair in pairs}
+    baseline = [{"id": pair_id, "verdict": verdict} for pair_id, verdict in length_choices.items()]
+    unequal = [pair_id for pair_id, choice in length_choices.items() if choice != "TIE"]
     order_changes = sum(base[object_id] != swap[object_id] for object_id in ids)
-    longer_choices = sum(base[pair["id"]] == longer_answer(pair) for pair in unequal)
+    longer_choices = sum(base[pair_id] == length_choices[pair_id] for pair_id in unequal)
     probes = [
         {
             "probe": "Перестановка A/B",

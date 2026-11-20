@@ -16,6 +16,7 @@ INITIALS = {"A1": "AU", "A2": "VO", "A3": "AD"}
 LABELS = {"A", "B", "TIE", "SKIP"}
 VERSIONS = {"1.0", "1.1"}
 ROWS_PER_ANNOTATOR = 28
+RESULT_FIELDS = ("label", "elapsed_seconds", "instruction_version")
 
 
 def read_annotations(path: Path) -> list[dict[str, str]]:
@@ -105,32 +106,28 @@ def save_annotations(path: Path, rows: list[dict[str, str]]) -> None:
 def merge_annotations(team_audit_dir: Path, personal_dir: Path) -> bool:
     team_path = team_audit_dir / "annotations.csv"
     team_rows = read_annotations(team_path)
-    assignments = validate_team_rows(team_path, team_rows)
+    merged = [row.copy() for row in team_rows]
+    assignments = validate_team_rows(team_path, merged)
 
+    # Сначала проверяем все личные таблицы целиком.
     personal_rows = {}
-    for annotator in ANNOTATORS:
+    for annotator, team_assignments in assignments.items():
         path = personal_dir / f"{INITIALS[annotator]}_annotations.csv"
         rows = read_annotations(path)
-        validate_personal_rows(path, annotator, rows, assignments[annotator])
+        validate_personal_rows(path, annotator, rows, team_assignments)
         personal_rows[annotator] = rows
 
-    merged = [row.copy() for row in team_rows]
-    positions = {
-        (row["annotator"], row["id"]): number
-        for number, row in enumerate(team_rows)
-    }
-    for annotator in ANNOTATORS:
-        for team_row, personal_row in zip(assignments[annotator], personal_rows[annotator]):
-            if team_row["label"] and any(
-                team_row[field] != personal_row[field]
-                for field in ("label", "elapsed_seconds")
-            ):
+    # Строки assignments уже ссылаются на копию командного файла.
+    for annotator, team_assignments in assignments.items():
+        for team_row, personal_row in zip(team_assignments, personal_rows[annotator]):
+            saved = (team_row["label"], team_row["elapsed_seconds"])
+            incoming = (personal_row["label"], personal_row["elapsed_seconds"])
+            if team_row["label"] and saved != incoming:
                 raise ValueError(
                     f"{team_path}: existing annotation conflicts with {annotator} / {team_row['id']}"
                 )
-            target = merged[positions[(annotator, personal_row["id"])]]
-            for field in ("label", "elapsed_seconds", "instruction_version"):
-                target[field] = personal_row[field]
+            for field in RESULT_FIELDS:
+                team_row[field] = personal_row[field]
 
     if merged == team_rows:
         return False
